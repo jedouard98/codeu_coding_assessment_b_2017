@@ -19,6 +19,8 @@ import java.io.IOException;
 import com.google.codeu.mathlang.core.tokens.Token;
 import com.google.codeu.mathlang.parsing.TokenReader;
 
+import java.util.HashSet;
+
 // MY TOKEN READER
 //
 // This is YOUR implementation of the token reader interface. To know how
@@ -26,10 +28,17 @@ import com.google.codeu.mathlang.parsing.TokenReader;
 // You should not need to change any other files to get your token reader to
 // work with the test of the system.
 public final class MyTokenReader implements TokenReader {
+  public String source;
+  public HashSet<char> operationSymbols;
+
+  private int cursorPosition;
+  private boolean iteratingThroughNote;
 
   public MyTokenReader(String source) {
     // Your token reader will only be given a string for input. The string will
     // contain the whole source (0 or more lines).
+
+    this.source = new String(source);
   }
 
   @Override
@@ -41,6 +50,25 @@ public final class MyTokenReader implements TokenReader {
     // If for any reason you detect an error in the input, you may throw an IOException
     // which will stop all execution.
 
+    StringBuilder sb = new StringBuilder();
+    for (int i = 0; i < source.length(); i++) {
+      char c = source.charAt(i);
+      if (c == "\"") {
+        iteratingThroughNote = true;
+      }
+      if (endOfTokenCondition(c)) {
+        cursorPosition = i;
+        return sb.toString();
+      }
+      if (!(Character.isWhiteSpace()))
+        sb.append(source.charAt(c));
+    }
+
     return null;
+  }
+
+  private boolean endOfTokenCondition(Char c) {
+    if (iteratingThroughNote && c != "\"") return false;
+    return ((Character.isWhiteSpace(source.charAt(c)) && sb.length() > 0) || (c == ";"))
   }
 }
